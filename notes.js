@@ -1,11 +1,18 @@
+
 state = Calc.getState()
+
+var resetText = "r_{eset}=T\\to0"
+
+for (var i = 1; i < 90; i++) {
+    resetText += ",o_{" + i + "}\\to-1000,L_{" + i + "}\\to0,A_{" + i + "}\\to1"
+}
 
 state.expressions.list.push(
 {
     type: "expression",
     id: "18",
     color: "#388c46",
-    latex: "r_{eset}=T\\to0"
+    latex: resetText
 },
 {
     type: "expression",
@@ -31,7 +38,7 @@ state.expressions.list.push(
     type: "expression",
     id: "56",
     color: "#aaaaaa",
-    latex: "T=6000",
+    latex: "T=0",
     slider: {
         hardMin: true,
         min: "0",
@@ -65,7 +72,7 @@ state.expressions.list.push(
 },
 )
 
-for (var i = 0; i < 90; i++) {
+for (var i = 1; i < 90; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4175",
@@ -90,7 +97,7 @@ for (var i = 1; i < 90; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4174",
-        latex: "o_{" + i + "}=0"
+        latex: "o_{" + i + "}=-1000"
     })
 }
 
@@ -123,7 +130,7 @@ for (var i = 1; i < 90; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4169",
-        latex: "L_{" + i + "}=1000"
+        latex: "L_{" + i + "}=0"
     })
 }
 
@@ -135,22 +142,17 @@ state.expressions.list.push(
     collapsed: true
 })
 
+for (var i = 1; i < 90; i++) {
+    state.expressions.list.push(
+        {
+            type: "expression",
+            folderId: "4171",
+            latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a"
+        }
+    )
+}
 
 state.expressions.list.push(
-{
-    type: "expression",
-    id: "61",
-    folderId: "4171",
-    color: "#aaaaaa",
-    latex: "p_{lay49}\\left(L,a\\right)=o_{49}\\to T,L_{49}\\to L,A_{49}\\to a"
-},
-{
-    type: "expression",
-    id: "76",
-    folderId: "4171",
-    color: "#aaaaaa",
-    latex: "p_{lay53}\\left(L,a\\right)=o_{53}\\to T,L_{53}\\to L,A_{53}\\to a"
-},
 {
     type: "folder",
     id: "43",
