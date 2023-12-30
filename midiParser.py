@@ -1,7 +1,10 @@
 import mido
-mid = mido.MidiFile('midiTest3.mid')
-mid = mido.MidiFile('midi1B.mid')
+mid = mido.MidiFile('midiTest5.mid')
+# mid = mido.MidiFile('midi2.mid')
 f = open("midi1.txt", "w")
+
+fps = 20
+frame = 1000/fps
 
 messages = []
 
@@ -40,22 +43,32 @@ notes = {}
 totalTime = 0
 
 for msg in messages:
-    # f.write(str(msg)+"\n")
-    msg["time"] = round(msg["time"]/10) * 10
+    # msg["time"] *= 1.5
+    # msg["time"] = msg["time"] + frame / 2
+    # msg["time"] = (msg["time"] - (msg["time"] % frame))
+    msg["time"] = int(msg["time"] / 10) * 10
     for d in range(len(durations)):
         if isOn[d]:
             durations[d] += msg["time"]
     totalTime += msg["time"]
     if msg["type"] == "note_on":
-        print("creating note " + str(msg["note"]) + " at time " + str(totalTime))
+        # print("creating note " + str(msg["note"]) + " at time " + str(totalTime))
         if totalTime in notes:
-            notes[totalTime].append([msg["note"], durations[msg["note"]], msg["velocity"]])
+            flag = True
+            # Check if note is already bieng played at totalTime. If so, don't play it and raise an alert
+            for note in notes[totalTime]:
+                if note[0] == msg["note"]:
+                    print("WARNING: note " + str(msg["note"]) + " is already being played at time " + str(totalTime))
+                    flag = False
+                    break
+            if flag:
+                notes[totalTime].append([msg["note"], durations[msg["note"]], msg["velocity"]])
         else:
             notes[totalTime] = [[msg["note"], durations[msg["note"]], msg["velocity"]]]
         durations[msg["note"]] = 0
         isOn[msg["note"]] = True
     else: # Note released
-        print("releasing note " + str(msg["note"]) + " at time " + str(totalTime))
+        # print("releasing note " + str(msg["note"]) + " at time " + str(totalTime))
         isOn[msg["note"]] = False
         for note in notes[totalTime - durations[msg["note"]]]:
             if note[0] == msg["note"]:
@@ -64,12 +77,12 @@ for msg in messages:
     
 # f.write(str(notes))
 # for n in notes:
-#     f.write(str(n) + "\n")
+#     f.write(str(notes[n]) + "\n")
 
 for n in notes:
     result += ("\left|T-" + str(n * 2)) + "\\right|\le20:\left("
     for note in notes[n]:
-        result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(note[1] / 2) + "," + str(note[2] / 100) + "\\right),"
+        result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(note[1] * 1.5) + "," + str(note[2] / 100) + "\\right),"
     result = result[:-1]
     result += "\\right),"
 
