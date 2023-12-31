@@ -1,10 +1,20 @@
 
 state = Calc.getState()
 
+state.expressions.list.push(
+    {
+    type: "expression",
+    latex:  "o"
+    }
+)
+
+Calc.setState(state)
+
+
 var resetText = "r_{eset}=T\\to0"
 
 for (var i = 1; i < 90; i++) {
-    resetText += ",o_{" + i + "}\\to-1000,L_{" + i + "}\\to0,A_{" + i + "}\\to1"
+    resetText += ",o_{" + i + "}\\to-1000,L_{" + i + "}\\to0,A_{" + i + "}\\to1,p_{" + i + "}\\to0"
 }
 
 state.expressions.list.push(
@@ -81,9 +91,6 @@ for (var i = 1; i < 90; i++) {
 
 }
 
-
-
-
 state.expressions.list.push(
 {
     type: "folder",
@@ -134,6 +141,9 @@ for (var i = 1; i < 90; i++) {
     })
 }
 
+state = Calc.getState()
+
+
 state.expressions.list.push(
 {
     type: "folder",
@@ -141,16 +151,46 @@ state.expressions.list.push(
     title: "Actions",
     collapsed: true
 })
+    
 
 for (var i = 1; i < 90; i++) {
     state.expressions.list.push(
         {
             type: "expression",
             folderId: "4171",
-            latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a"
+            // latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a"
+            latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a,p_{" + i + "}\\to-H"
+            // \\left\\{T-o_{" + i + "}>L_{" + i + "}:p_{" + i + "}\\to0\\right\\}
         }
     )
 }
+
+
+
+
+Calc.setState(state)
+
+state.expressions.list.push(
+{
+    type: "folder",
+    id: "4172",
+    title: "Key Positions",
+    collapsed: true
+})
+
+for (var i = 1; i < 90; i++) {
+    state.expressions.list.push(
+        {
+            type: "expression",
+            folderId: "4172",
+            latex: "p_{" + i + "}=0"
+            // latex: "p_{" + i + "}=\\left\\{\\left(T-o_{" + i + "}\\right)<50:-\\frac{H}{50}\\left(T-o_{" + i + "}\\right),T-o_{" + i + "}<L_{" + i + "}-50:-H,T-o_{" + i + "}<L_{" + i + "}:\\frac{H}{50}\\left(T-o_{" + i + "}\\right)-\\frac{L_{" + i + "}H}{50},0\\right\\}"
+        }
+    )
+}
+
+// Calc.setState(state)
+
 
 state.expressions.list.push(
 {

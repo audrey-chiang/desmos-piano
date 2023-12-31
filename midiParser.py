@@ -1,7 +1,8 @@
 import mido
 mid = mido.MidiFile('midiTest5.mid')
-# mid = mido.MidiFile('midi2.mid')
+mid = mido.MidiFile('midi3.mid')
 f = open("midi1.txt", "w")
+f2 = open("midi2.txt", "w")
 
 fps = 20
 frame = 1000/fps
@@ -9,6 +10,7 @@ frame = 1000/fps
 messages = []
 
 result = "s_{ounds}=\left\{"
+result2 = "k_{eys}=\left\{"
 
 # "s_{ounds}=\left\{T=0:\left(p_{lay57}\left(2000,1\right),p_{lay60}\left(2000,1\right)\right),
 # \left|T-170\right|\le20:\left(p_{lay69}\left(600,1.5\right),p_{lay72}\left(600,1.5\right)\right),
@@ -39,6 +41,7 @@ isOn = [False] * 121
 durations = [0] * 121
 velocities = [0] * 121
 notes = {}
+keyRelease = {}
 
 totalTime = 0
 
@@ -46,7 +49,7 @@ for msg in messages:
     # msg["time"] *= 1.5
     # msg["time"] = msg["time"] + frame / 2
     # msg["time"] = (msg["time"] - (msg["time"] % frame))
-    msg["time"] = int(msg["time"] / 10) * 10
+    msg["time"] = int(msg["time"] * 1 / 10) * 10
     for d in range(len(durations)):
         if isOn[d]:
             durations[d] += msg["time"]
@@ -68,6 +71,20 @@ for msg in messages:
         durations[msg["note"]] = 0
         isOn[msg["note"]] = True
     else: # Note released
+        if totalTime in keyRelease:
+            flag = True
+            for key in keyRelease[totalTime]:
+                if key == msg["note"]:
+                    print("WARNING: note " + str(msg["note"]) + " is already being released at time " + str(totalTime))
+                    flag = False
+                    break
+            if flag:
+                keyRelease[totalTime].append(msg["note"])
+        else:
+            keyRelease[totalTime] = [msg["note"]]
+            
+
+        # result2 += "\left|T-" + str(totalTime) + "\\right|\le20:p_{" + str((msg["note"] - 20)) + "}\\to 0,"
         # print("releasing note " + str(msg["note"]) + " at time " + str(totalTime))
         isOn[msg["note"]] = False
         for note in notes[totalTime - durations[msg["note"]]]:
@@ -82,15 +99,28 @@ for msg in messages:
 for n in notes:
     result += ("\left|T-" + str(n * 2)) + "\\right|\le20:\left("
     for note in notes[n]:
-        result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(note[1] * 1.5) + "," + str(note[2] / 100) + "\\right),"
+        result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(note[1] * 1) + "," + str(note[2] / 100) + "\\right),"
     result = result[:-1]
     result += "\\right),"
+
+
+for n in keyRelease:
+    result2 += ("\left|T-" + str(n * 2)) + "\\right|\le20:\left("
+    for key in keyRelease[n]:
+        result2 += "p_{" + str(key - 20) + "}\\to 0,"
+    result2 = result2[:-1]
+    result2 += "\\right),"
 
 result = result[:-1]
 result += "\\right\}"
 
-f.write(result)
 
+result2 = result2[:-1]
+result2 += "\\right\}"
+
+f.write(result)
+f2.write(result2)
 
 f.close()
+f2.close()
 
