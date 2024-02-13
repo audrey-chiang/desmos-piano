@@ -1,10 +1,10 @@
 import mido
-mid = mido.MidiFile('midiTest5.mid')
-mid = mido.MidiFile('midi3.mid')
+mid = mido.MidiFile('midiTest8.mid')
+mid = mido.MidiFile('midi9.mid')
 f = open("midi1.txt", "w")
 f2 = open("midi2.txt", "w")
 
-fps = 20
+fps = 40
 frame = 1000/fps
 
 messages = []
@@ -16,6 +16,7 @@ result2 = "k_{eys}=\left\{"
 # \left|T-170\right|\le20:\left(p_{lay69}\left(600,1.5\right),p_{lay72}\left(600,1.5\right)\right),
 # \left|T-670\right|\le20:\left(p_{lay65}\left(500,0.5\right),p_{lay69}\left(500,0.5\right)\right)\right\}"
 
+usedNotes = []
 
 # \left|T-500\right|\le20:\left(p_{lay1})
 def parseMsg(msg):
@@ -26,16 +27,16 @@ def parseMsg(msg):
         result["velocity"] = msg.velocity
         result["time"] = msg.time
         return result
-
-
+    if msg.type == "control_change" and msg.control == 64:
+        result["type"] = msg.type
+        result["value"] = 1 if msg.value > 0 else 0
+        result["time"] = msg.time
+        return result
 
 track = mid.tracks[0]
 for msg in track:
     if parseMsg(msg):
         messages.append(parseMsg(msg))
-    # messages.append(msg)
-    # f.write(str(msg)+"\n")
-    # f.write(str(parseMsg(msg)) + "\n")
         
 isOn = [False] * 121
 durations = [0] * 121
@@ -45,16 +46,27 @@ keyRelease = {}
 
 totalTime = 0
 
+# f2.write(str(mid.tracks))
+
+
+
+
 for msg in messages:
     # msg["time"] *= 1.5
     # msg["time"] = msg["time"] + frame / 2
     # msg["time"] = (msg["time"] - (msg["time"] % frame))
-    msg["time"] = int(msg["time"] * 1 / 10) * 10
+    # f2.write(str(msg["time"]) + "\n")
+    # Round to the nearest multiple of 12
+    msg["time"] = msg["time"] + 12 / 2
+    msg["time"] = (msg["time"] - (msg["time"] % 12))
+    # msg["time"] = int(msg["time"] * 1 / 10) * 10
     for d in range(len(durations)):
         if isOn[d]:
             durations[d] += msg["time"]
     totalTime += msg["time"]
     if msg["type"] == "note_on":
+        if (msg["note"] - 20) not in usedNotes:
+            usedNotes.append(msg["note"] - 20)
         # print("creating note " + str(msg["note"]) + " at time " + str(totalTime))
         if totalTime in notes:
             flag = True
@@ -70,7 +82,7 @@ for msg in messages:
             notes[totalTime] = [[msg["note"], durations[msg["note"]], msg["velocity"]]]
         durations[msg["note"]] = 0
         isOn[msg["note"]] = True
-    else: # Note released
+    elif msg["type"] == "note_off": # Note released
         if totalTime in keyRelease:
             flag = True
             for key in keyRelease[totalTime]:
@@ -82,34 +94,101 @@ for msg in messages:
                 keyRelease[totalTime].append(msg["note"])
         else:
             keyRelease[totalTime] = [msg["note"]]
-            
-
-        # result2 += "\left|T-" + str(totalTime) + "\\right|\le20:p_{" + str((msg["note"] - 20)) + "}\\to 0,"
+        # str(totalTime) + "\\right|\le10:p_{" + str((msg["note"] - 20)) + "}\\to 0," # CHANGED
+        str(totalTime) + "\\right|\le10:p_{" + str((msg["note"] - 20)) + "}\\to 0,"
         # print("releasing note " + str(msg["note"]) + " at time " + str(totalTime))
         isOn[msg["note"]] = False
         for note in notes[totalTime - durations[msg["note"]]]:
             if note[0] == msg["note"]:
                 note[1] = durations[msg["note"]]
                 break
+    else: # Sustain pedal
+        if msg["value"] == 1: # Pedal is pressed
+            # If pedalUp at same time, then replace with pedalDown
+            if totalTime in notes and "pedalUp" in notes[totalTime]:
+                notes[totalTime].remove("pedalUp")
+                notes[totalTime].append("pedalDown")
+            # Else, add pedalDown
+            elif totalTime in notes and "pedalDown" not in notes[totalTime]:
+                notes[totalTime].append("pedalDown")
+            else:
+                notes[totalTime] = ["pedalDown"]
+        elif msg["value"] == 0: # Pedal is released
+            # If pedalDown at same time, then replace with pedalUp
+            if totalTime in notes and "pedalDown" in notes[totalTime]:
+                notes[totalTime].remove("pedalDown")
+                notes[totalTime].append("pedalUp")
+            elif totalTime in notes and "pedalUp" not in notes[totalTime]:
+                notes[totalTime].append("pedalUp")
+            else:
+                notes[totalTime] = ["pedalUp"]
+
+        
     
 # f.write(str(notes))
 # for n in notes:
 #     f.write(str(notes[n]) + "\n")
+toAdd = {}
+for n in keyRelease:
+    if n not in notes:
+        notes[n] = []
+    elif n in notes: # Check if key is being played at the same time it is being released. If so, release after 50 ms
+        for key in keyRelease[n]:
+            for note in notes[n]:
+                if (not isinstance(note, str)) and note[0] == key:
+                    # toAdd[n + 49] = key
+                    print("FIXED: removed note " + str(note) + " from time " + str(n) + " = " + str(n/384))
+                    notes[n].remove(note)
+                    keyRelease[n].remove(key)
+                    break
 
+# f2.write(str(keyRelease))
+
+# for t in toAdd:
+#     if t in keyRelease:
+#         if toAdd[t] not in keyRelease[t]:
+#             keyRelease[t].append(toAdd[t])
+#             print("FIXED: shifted note " + str(toAdd[t]) + " from time " + str(t - 50) + " to time " + str(t))
+#         else:
+#             print("NOT FIXED: note " + str(toAdd[t]) + " is already being released at time " + str(t))
+#     else:
+#         keyRelease[t] = [toAdd[t]]
+        
+f2.write(str(notes))
 for n in notes:
-    result += ("\left|T-" + str(n * 2)) + "\\right|\le20:\left("
-    for note in notes[n]:
-        result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(note[1] * 1) + "," + str(note[2] / 100) + "\\right),"
+    # Change BPM
+    # result += ("\left|T-" + str(n * 1)) + "\\right|\le10:\left(" # CHANGED
+    result += ("T=" + str(n * 2)) + ":\left("
+    # only released at time n:
+    # if notes[n] == []:
+    #     for key in keyRelease[n]:
+    #         result += "p_{" + str(key - 20) + "}\\to 0,"
+    if n in keyRelease: # released at time n
+        for key in keyRelease[n]:
+            result += "p_{" + str(key - 20) + "}\\to 1," # CHANGED to 0
+    for note in notes[n]: # played at time n
+        if not isinstance(note, str): # If not pedalUp or pedalDown
+            # note = [note, duration, velocity]
+            result += "p_{lay" + str(note[0] - 20) + "}\left(" + str(round(note[1] * 1.75)) + "," + str(round((note[2] / 100) ** 2, 2)) + "\\right),"
+        else: # If pedalUp or pedalDown
+            if note == "pedalDown": # 0 = pedal down, 1 = pedal up
+                result += "p_{edal}\\to 0,"
+            else:
+                result += "p_{edal}\\to 1,"
+            
     result = result[:-1]
     result += "\\right),"
 
 
 for n in keyRelease:
-    result2 += ("\left|T-" + str(n * 2)) + "\\right|\le20:\left("
+    result2 += ("\left|T-" + str(n * 2)) + "\\right|\le10:\left("
     for key in keyRelease[n]:
         result2 += "p_{" + str(key - 20) + "}\\to 0,"
     result2 = result2[:-1]
     result2 += "\\right),"
+
+
+
 
 result = result[:-1]
 result += "\\right\}"
@@ -119,7 +198,8 @@ result2 = result2[:-1]
 result2 += "\\right\}"
 
 f.write(result)
-f2.write(result2)
+# f2.write(result2)
+f2.write("usedNotes = " + str(usedNotes))
 
 f.close()
 f2.close()

@@ -1,21 +1,32 @@
 
 state = Calc.getState()
 
-state.expressions.list.push(
-    {
-    type: "expression",
-    latex:  "o"
-    }
-)
-
-Calc.setState(state)
 
 
+// state.expressions.list.push(
+//     {
+//     type: "expression",
+//     latex:  "o"
+//     }
+// )
+
+usedNotes = [45, 48, 57, 60, 53, 46, 49, 52, 55, 50, 43, 41, 40, 38, 37, 36, 34, 33, 31, 24, 17, 22, 29, 21, 39, 62, 26, 7, 19, 69, 67, 65, 58, 64, 70, 12, 13, 25, 14, 16, 28, 72, 44, 56]
 var resetText = "r_{eset}=T\\to0"
 
-for (var i = 1; i < 90; i++) {
-    resetText += ",o_{" + i + "}\\to-1000,L_{" + i + "}\\to0,A_{" + i + "}\\to1,p_{" + i + "}\\to0"
+for (var i = 0; i < usedNotes.length; i++) {
+    resetText += ",o_{" + usedNotes[i] + "}\\to-1000,L_{" + usedNotes[i] + "}\\to0,A_{" + usedNotes[i] + "}\\to1,p_{" + usedNotes[i] + "}\\to1" // CHANGED to0
 }
+
+state.expressions.list.push(
+    {
+        type: "expression",
+        id: "18",
+        color: "#388c46",
+        latex: resetText
+    })
+
+Calc.setState(state);
+
 
 state.expressions.list.push(
 {
@@ -82,11 +93,11 @@ state.expressions.list.push(
 },
 )
 
-for (var i = 1; i < 90; i++) {
+for (var i = 0; i < usedNotes.length; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4175",
-        latex: "A_{" + i + "}=1"
+        latex: "A_{" + usedNotes[i] + "}=1"
     })
 
 }
@@ -100,11 +111,11 @@ state.expressions.list.push(
 }
 )
 
-for (var i = 1; i < 90; i++) {
+for (var i = 0; i < usedNotes.length; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4174",
-        latex: "o_{" + i + "}=-1000"
+        latex: "o_{" + usedNotes[i] + "}=-1000"
     })
 }
 
@@ -117,11 +128,11 @@ state.expressions.list.push(
     }
 )
 
-for (var i = 1; i < 90; i++) {
+for (var i = 0; i < usedNotes.length; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4170",
-        latex: "t_{" + i + "}=\\operatorname{tone}\\left(p_{artials}.x\\cdot n_{otes}\\left[" + i + "\\right],A_{" + i + "}p_{artials}.y\\cdot\\frac{E\\left(T-o_{" + i + "},L_{" + i + "}\\right)}{p_{artials}.x}\\right)"
+        latex: "t_{" + usedNotes[i] + "}=\\operatorname{tone}\\left(p_{artials}.x\\cdot n_{otes}\\left[" + usedNotes[i]  + "\\right],A_{" + usedNotes[i] + "}p_{artials}.y\\cdot\\frac{E\\left(T-o_{" + usedNotes[i] + "},L_{" + usedNotes[i] + "}\\right)}{p_{artials}.x}\\right)"
     })
 }
 state.expressions.list.push(
@@ -133,16 +144,13 @@ state.expressions.list.push(
     }
 )
 
-for (var i = 1; i < 90; i++) {
+for (var i = 0; i < usedNotes.length; i++) {
     state.expressions.list.push({
         type: "expression",
         folderId: "4169",
-        latex: "L_{" + i + "}=0"
+        latex: "L_{" + usedNotes[i] + "}=0"
     })
 }
-
-state = Calc.getState()
-
 
 state.expressions.list.push(
 {
@@ -153,22 +161,18 @@ state.expressions.list.push(
 })
     
 
-for (var i = 1; i < 90; i++) {
+for (var i = 0; i < usedNotes.length; i++) {
     state.expressions.list.push(
         {
             type: "expression",
             folderId: "4171",
             // latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a"
-            latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a,p_{" + i + "}\\to-H"
+            latex: "p_{lay" + usedNotes[i] + "}\\left(L,a\\right)=o_{" + usedNotes[i] + "}\\to T,L_{" + usedNotes[i] + "}\\to L,A_{" + usedNotes[i] + "}\\to a,p_{" + usedNotes[i] + "}\\to0" // CHANGED to-H
             // \\left\\{T-o_{" + i + "}>L_{" + i + "}:p_{" + i + "}\\to0\\right\\}
         }
     )
 }
 
-
-
-
-Calc.setState(state)
 
 state.expressions.list.push(
 {
@@ -183,7 +187,7 @@ for (var i = 1; i < 90; i++) {
         {
             type: "expression",
             folderId: "4172",
-            latex: "p_{" + i + "}=0"
+            latex: "p_{" + i + "}=0" // CHANGED =0
             // latex: "p_{" + i + "}=\\left\\{\\left(T-o_{" + i + "}\\right)<50:-\\frac{H}{50}\\left(T-o_{" + i + "}\\right),T-o_{" + i + "}<L_{" + i + "}-50:-H,T-o_{" + i + "}<L_{" + i + "}:\\frac{H}{50}\\left(T-o_{" + i + "}\\right)-\\frac{L_{" + i + "}H}{50},0\\right\\}"
         }
     )
