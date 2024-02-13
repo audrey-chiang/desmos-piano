@@ -1,8 +1,8 @@
 import mido
-mid = mido.MidiFile('midiTest8.mid')
-mid = mido.MidiFile('midi9.mid')
-f = open("midi1.txt", "w")
-f2 = open("midi2.txt", "w")
+mid = mido.MidiFile('midiFiles/midiTest8.mid')
+mid = mido.MidiFile('midiFiles/midi9.mid')
+f = open("output/midi1.txt", "w")
+f2 = open("output/midi2.txt", "w")
 
 fps = 40
 frame = 1000/fps
@@ -12,13 +12,8 @@ messages = []
 result = "s_{ounds}=\left\{"
 result2 = "k_{eys}=\left\{"
 
-# "s_{ounds}=\left\{T=0:\left(p_{lay57}\left(2000,1\right),p_{lay60}\left(2000,1\right)\right),
-# \left|T-170\right|\le20:\left(p_{lay69}\left(600,1.5\right),p_{lay72}\left(600,1.5\right)\right),
-# \left|T-670\right|\le20:\left(p_{lay65}\left(500,0.5\right),p_{lay69}\left(500,0.5\right)\right)\right\}"
-
 usedNotes = []
 
-# \left|T-500\right|\le20:\left(p_{lay1})
 def parseMsg(msg):
     result = {}
     if msg.type == "note_on" or msg.type == "note_off":
@@ -46,11 +41,6 @@ keyRelease = {}
 
 totalTime = 0
 
-# f2.write(str(mid.tracks))
-
-
-
-
 for msg in messages:
     # msg["time"] *= 1.5
     # msg["time"] = msg["time"] + frame / 2
@@ -70,7 +60,7 @@ for msg in messages:
         # print("creating note " + str(msg["note"]) + " at time " + str(totalTime))
         if totalTime in notes:
             flag = True
-            # Check if note is already bieng played at totalTime. If so, don't play it and raise an alert
+            # Check if note is already being played at totalTime. If so, don't play it and raise an alert
             for note in notes[totalTime]:
                 if note[0] == msg["note"]:
                     print("WARNING: note " + str(msg["note"]) + " is already being played at time " + str(totalTime))
@@ -124,10 +114,6 @@ for msg in messages:
                 notes[totalTime] = ["pedalUp"]
 
         
-    
-# f.write(str(notes))
-# for n in notes:
-#     f.write(str(notes[n]) + "\n")
 toAdd = {}
 for n in keyRelease:
     if n not in notes:
