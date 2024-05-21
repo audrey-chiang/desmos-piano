@@ -1,15 +1,6 @@
 
 state = Calc.getState()
 
-
-
-// state.expressions.list.push(
-//     {
-//     type: "expression",
-//     latex:  "o"
-//     }
-// )
-
 usedNotes = [45, 48, 57, 60, 53, 46, 49, 52, 55, 50, 43, 41, 40, 38, 37, 36, 34, 33, 31, 24, 17, 22, 29, 21, 39, 62, 26, 7, 19, 69, 67, 65, 58, 64, 70, 12, 13, 25, 14, 16, 28, 72, 44, 56]
 var resetText = "r_{eset}=T\\to0"
 
@@ -26,7 +17,6 @@ state.expressions.list.push(
     })
 
 Calc.setState(state);
-
 
 state.expressions.list.push(
 {
@@ -167,8 +157,7 @@ for (var i = 0; i < usedNotes.length; i++) {
             type: "expression",
             folderId: "4171",
             // latex: "p_{lay" + i + "}\\left(L,a\\right)=o_{" + i + "}\\to T,L_{" + i + "}\\to L,A_{" + i + "}\\to a"
-            latex: "p_{lay" + usedNotes[i] + "}\\left(L,a\\right)=o_{" + usedNotes[i] + "}\\to T,L_{" + usedNotes[i] + "}\\to L,A_{" + usedNotes[i] + "}\\to a,p_{" + usedNotes[i] + "}\\to0" // CHANGED to-H
-            // \\left\\{T-o_{" + i + "}>L_{" + i + "}:p_{" + i + "}\\to0\\right\\}
+            latex: "p_{lay" + usedNotes[i] + "}\\left(L,a\\right)=o_{" + usedNotes[i] + "}\\to T,L_{" + usedNotes[i] + "}\\to L,A_{" + usedNotes[i] + "}\\to a,p_{" + usedNotes[i] + "}\\to0" // CHANGED to -H
         }
     )
 }
@@ -192,9 +181,6 @@ for (var i = 1; i < 90; i++) {
         }
     )
 }
-
-// Calc.setState(state)
-
 
 state.expressions.list.push(
 {
@@ -310,8 +296,7 @@ state.expressions.list.push(
     id: "16",
     color: "#c74440",
     latex: "n_{otes}=\\left[27.5\\cdot2^{\\frac{i}{12}}\\operatorname{for}i=\\left[0...87\\right]\\right]"
-}
-    
+}  
 )
 
 Calc.setState(state)

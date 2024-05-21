@@ -1,5 +1,4 @@
 import mido
-mid = mido.MidiFile('midiFiles/midiTest8.mid')
 mid = mido.MidiFile('midiFiles/midi9.mid')
 f = open("output/midi1.txt", "w")
 f2 = open("output/midi2.txt", "w")
@@ -42,10 +41,6 @@ keyRelease = {}
 totalTime = 0
 
 for msg in messages:
-    # msg["time"] *= 1.5
-    # msg["time"] = msg["time"] + frame / 2
-    # msg["time"] = (msg["time"] - (msg["time"] % frame))
-    # f2.write(str(msg["time"]) + "\n")
     # Round to the nearest multiple of 12
     msg["time"] = msg["time"] + 12 / 2
     msg["time"] = (msg["time"] - (msg["time"] % 12))
@@ -113,7 +108,6 @@ for msg in messages:
             else:
                 notes[totalTime] = ["pedalUp"]
 
-        
 toAdd = {}
 for n in keyRelease:
     if n not in notes:
@@ -128,27 +122,11 @@ for n in keyRelease:
                     keyRelease[n].remove(key)
                     break
 
-# f2.write(str(keyRelease))
-
-# for t in toAdd:
-#     if t in keyRelease:
-#         if toAdd[t] not in keyRelease[t]:
-#             keyRelease[t].append(toAdd[t])
-#             print("FIXED: shifted note " + str(toAdd[t]) + " from time " + str(t - 50) + " to time " + str(t))
-#         else:
-#             print("NOT FIXED: note " + str(toAdd[t]) + " is already being released at time " + str(t))
-#     else:
-#         keyRelease[t] = [toAdd[t]]
-        
 f2.write(str(notes))
 for n in notes:
     # Change BPM
     # result += ("\left|T-" + str(n * 1)) + "\\right|\le10:\left(" # CHANGED
     result += ("T=" + str(n * 2)) + ":\left("
-    # only released at time n:
-    # if notes[n] == []:
-    #     for key in keyRelease[n]:
-    #         result += "p_{" + str(key - 20) + "}\\to 0,"
     if n in keyRelease: # released at time n
         for key in keyRelease[n]:
             result += "p_{" + str(key - 20) + "}\\to 1," # CHANGED to 0
@@ -161,10 +139,8 @@ for n in notes:
                 result += "p_{edal}\\to 0,"
             else:
                 result += "p_{edal}\\to 1,"
-            
     result = result[:-1]
     result += "\\right),"
-
 
 for n in keyRelease:
     result2 += ("\left|T-" + str(n * 2)) + "\\right|\le10:\left("
@@ -173,20 +149,14 @@ for n in keyRelease:
     result2 = result2[:-1]
     result2 += "\\right),"
 
-
-
-
 result = result[:-1]
 result += "\\right\}"
-
 
 result2 = result2[:-1]
 result2 += "\\right\}"
 
 f.write(result)
-# f2.write(result2)
 f2.write("usedNotes = " + str(usedNotes))
 
 f.close()
 f2.close()
-
